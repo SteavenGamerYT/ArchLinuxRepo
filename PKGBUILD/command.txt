@@ -1,1 +1,4 @@
 makepkg -src --skipinteg
+gpg --detach-sign *.pkg.tar.zst
+
+repo-add --verify --sign steavengameryt.db.tar.gz *.pkg.tar.zst
