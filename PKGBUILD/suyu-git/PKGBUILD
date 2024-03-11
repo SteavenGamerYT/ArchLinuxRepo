@@ -7,10 +7,35 @@ pkgdesc="Suyu Emulator"
 arch=('x86_64')
 url="https://gitlab.com/suyu-emu/suyu"
 license=('GPL')
-depends=('base-devel' 'boost' 'catch2' 'cmake' 'ffmpeg' 'fmt' 'git' 'glslang' 'libzip' 'lz4' 'mbedtls' 'ninja' 'nlohmann-json' 'nasm' 'openssl' 'opus' 'pkg-config' 'qt6-base' 'zlib' 'zstd' 'enet')
-makedepends=()
-provides=("suyu")
-conflicts=("suyu")
+depends=(
+  brotli
+  enet
+  gcc-libs
+  glibc
+  hicolor-icon-theme
+  libavcodec.so
+  libavutil.so
+  libboost_context.so
+  libcrypto.so
+  libfmt.so
+  libopus.so
+  libspeexdsp.so
+  libssl.so
+  libswscale.so
+  libusb-1.0.so
+  libva.so
+  libzstd.so
+  lz4
+  qt5-base
+  qt5-multimedia
+  qt5-webengine
+  sdl2
+  vulkan-utility-libraries
+  zlib
+)
+makedepends=('base-devel' 'boost' 'catch2' 'cmake' 'ffmpeg' 'fmt' 'git' 'glslang' 'libzip' 'lz4' 'mbedtls' 'ninja' 'nlohmann-json' 'nasm' 'openssl' 'opus' 'pkg-config' 'qt6-base' 'zlib' 'zstd')
+provides=('suyu')
+conflicts=(suyu-dev-git yuzu yuzu-early-access-appimage yuzu-early-access-git)
 source=("git+https://gitlab.com/suyu-emu/suyu.git")
 
 pkgver() {

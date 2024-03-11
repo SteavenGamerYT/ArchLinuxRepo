@@ -2,3 +2,6 @@ makepkg -src --skipinteg
 gpg --detach-sign *.pkg.tar.zst
 
 repo-add --verify --sign steavengameryt.db.tar.gz *.pkg.tar.zst
+
+sudo pacman-key --recv-keys 9FAC62FED767CB37AB4CA3D043C01C625A527075
+sudo pacman-key --lsign-key 9FAC62FED767CB37AB4CA3D043C01C625A527075
