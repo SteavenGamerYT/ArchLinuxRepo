@@ -1,0 +1,41 @@
+# Maintainer: Omar Hany Kasban <omarhanykasban706@gmail.com>
+
+pkgname=suyu-git
+pkgver=1
+pkgrel=1
+pkgdesc="Suyu Emulator"
+arch=('x86_64')
+url="https://gitlab.com/suyu-emu/suyu"
+license=('GPL')
+depends=('base-devel' 'boost' 'catch2' 'cmake' 'ffmpeg' 'fmt' 'git' 'glslang' 'libzip' 'lz4' 'mbedtls' 'ninja' 'nlohmann-json' 'nasm' 'openssl' 'opus' 'pkg-config' 'qt6-base' 'zlib' 'zstd')
+makedepends=()
+provides=("suyu")
+conflicts=("suyu")
+source=("git+https://gitlab.com/suyu-emu/suyu.git")
+
+pkgver() {
+  cd "$srcdir/suyu"
+  git fetch --tags >/dev/null 2>&1
+  if git describe --tags >/dev/null 2>&1; then
+    echo "$(git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g')"
+  else
+    echo "0.0.0.r$(git rev-list --count HEAD).$(git rev-parse --short HEAD)"
+  fi
+}
+
+
+build() {
+  cd "$srcdir/suyu"
+  git submodule update --init --recursive
+  mkdir -p build
+  cd build
+  cmake .. -GNinja -DSUYU_USE_BUNDLED_VCPKG=ON -DSUYU_TESTS=OFF
+  ninja
+}
+
+package() {
+  cd "$srcdir/suyu/build"
+  DESTDIR="$pkgdir" ninja install
+}
+
+# vim:set ts=2 sw=2 et:
