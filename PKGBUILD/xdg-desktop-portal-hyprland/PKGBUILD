@@ -1,0 +1,37 @@
+# Maintainer: Omar Hany Kasban <omarhanykasban706@gmail.com>
+
+pkgname=xdg-desktop-portal-hyprland
+pkgver=1.3.1
+pkgrel=1
+pkgdesc='xdg-desktop-portal backend for hyprland'
+arch=(x86_64 aarch64)
+url="https://github.com/hyprwm/${pkgname^}"
+license=(MIT)
+provides=(xdg-desktop-portal-impl xdg-desktop-portal-hyprland)
+depends=("libpipewire" "libinih" "qt6-base" "qt6-wayland" "wayland" "sdbus-cpp" "libdrm" "xdg-desktop-portal" "mesa" "hyprlang>=0.2.0")
+makedepends=("git" "wayland-protocols" "scdoc" "cmake")
+optdepends=(
+  "grim: required for the screenshot portal to function"
+  "slurp: support for interactive mode for the screenshot portal; one of the built-in chooser options for the screencast portal"
+  "hyprland: the Hyprland compositor"
+)
+_archive="${pkgname^}-$pkgver"
+source=("$_archive.tar.gz::$url/releases/download/v$pkgver/v$pkgver.tar.gz"
+hyprland-portals.conf)
+sha256sums=('SKIP' 'SKIP')
+
+prepare() {
+    mkdir -p "$srcdir/$_archive"
+    tar -xzf "$srcdir/$_archive.tar.gz" -C "$srcdir/$_archive" --strip-components=1
+}
+
+package() {
+    install -Dm0644 -t "$pkgdir/usr/bin/" xdph/hyprland-share-picker
+    install -Dm0644 -t "$pkgdir/usr/lib/" xdph/xdg-desktop-portal-hyprland
+    install -Dm0644 -t "$pkgdir/usr/lib/systemd/user/" xdph/xdg-desktop-portal-hyprland.service
+    install -Dm0644 -t "$pkgdir/usr/share/dbus-1/services/" xdph/org.freedesktop.impl.portal.desktop.hyprland.service
+    install -Dm0644 -t "$pkgdir/usr/share/xdg-desktop-portal/" "${srcdir}/hyprland-portals.conf"
+    install -Dm0644 -t "$pkgdir/usr/share/xdg-desktop-portal/portals/" xdph/hyprland.portal
+    chmod +x "$pkgdir/usr/lib/xdg-desktop-portal-hyprland"
+    chmod +x "$pkgdir/usr/bin/hyprland-share-picker"
+}

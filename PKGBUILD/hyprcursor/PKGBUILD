@@ -1,0 +1,39 @@
+# Maintainer: Omar Hany Kasban <omarhanykasban706@gmail.com>
+
+pkgname=hyprcursor
+pkgver=0.1.4
+pkgrel=1
+pkgdesc="The hyprland cursor format, library and utilities"
+arch=(x86_64 aarch64)
+url="https://github.com/hyprwm/${pkgname^}"
+license=(BSD-3-Clause)
+depends=('hyprlang>=0.4.2' 'cairo' 'libzip' 'librsvg')
+makedepends=('git' 'cmake' 'gcc' 'gdb')
+_archive="${pkgname^}-$pkgver"
+source=("$_archive.tar.gz::$url/releases/download/v$pkgver/v$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+
+prepare() {
+    mkdir -p "$srcdir/$_archive"
+    tar -xzf "$srcdir/$_archive.tar.gz" -C "$srcdir/$_archive" --strip-components=1
+}
+
+build() {
+    # No build action needed
+    :
+}
+
+package() {
+
+    # Copy binaries to /usr/bin/
+    install -Dm0644 -t "$pkgdir/usr/bin/" "hyprcursor/hyprcursor-util"
+    chmod +x "$pkgdir/usr/bin/hyprcursor-util"
+
+    # Copy Libs .so to /usr/lib/ (assuming it's in the source directory)
+    find hyprcursor -name '*.so.*' -type f -execdir \
+                install -Dm0755 -t "$pkgdir/usr/lib/" {} \;
+
+    # Copy configuration files to appropriate locations
+    install -Dm0644 -t "$pkgdir/usr/share/pkgconfig" hyprcursor/hyprcursor.pc
+}

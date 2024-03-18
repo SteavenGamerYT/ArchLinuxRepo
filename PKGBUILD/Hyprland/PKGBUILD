@@ -1,0 +1,92 @@
+# Maintainer: Omar Hany Kasban <omarhanykasban706@gmail.com>
+
+pkgname=hyprland
+pkgver=0.37.1
+pkgrel=1
+pkgdesc='a highly customizable dynamic tiling Wayland compositor'
+arch=(x86_64 aarch64)
+url="https://github.com/hyprwm/${pkgname^}"
+license=(BSD-3-Clause)
+depends=(cairo # libcairo.so
+         gcc-libs # libgcc_s.so libstdc++.so
+         glibc # libc.so libm.so
+         glib2 libgobject-2.0.so
+         glslang
+         hyprlang libhyprlang.so
+         libdisplay-info libdisplay-info.so
+         libdrm # libdrm.so
+         libglvnd libEGL.so libGLESv2.so libOpenGL.so
+         libinput # libinput.so
+         libliftoff libliftoff.so
+         libx11
+         libxcb # libxcb-dri3.so libxcb-present.so libxcb-render.so libxcb-res.so libxcb-shm.so libxcb.so libxcb-xfixes.so libxcb-xinput.so
+         libxcomposite # libxcb-composite.so
+         libxfixes
+         libxkbcommon libxkbcommon.so
+         libxrender
+         mesa # libgbm.so
+         opengl-driver
+         pango libpango-1.0.so libpangocairo-1.0.so
+         pixman libpixman-1.so
+         polkit
+         seatd libseat.so
+         systemd-libs libsystemd.so
+         tomlplusplus libtomlplusplus.so libudev.so
+         vulkan-icd-loader
+         vulkan-validation-layers
+         wayland libwayland-client.so libwayland-server.so
+         wayland-protocols
+         xcb-proto
+         xcb-util
+         xcb-util-errors # libxcb-errors.so
+         xcb-util-keysyms
+         xcb-util-renderutil # libxcb-render-util.so 
+         xcb-util-wm # libxcb-ewmh.so  libxcb-icccm.so 
+         xorg-xinput
+         xorg-xwayland
+         hyprcursor)
+makedepends=(cmake
+             gdb
+             meson
+             ninja
+             vulkan-headers
+             xorgproto)
+optdepends=('cmake: to build and install plugins using hyprpm'
+            'cpio: to build and install plugins using hyprpm'
+            'meson: to build and install plugins using hyprpm')
+_archive="${pkgname^}-$pkgver"
+source=("$_archive.tar.gz::$url/releases/download/v$pkgver/v$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+
+prepare() {
+    mkdir -p "$srcdir/$_archive"
+    tar -xzf "$srcdir/$_archive.tar.gz" -C "$srcdir/$_archive" --strip-components=1
+}
+
+build() {
+    # No build action needed
+    :
+}
+
+package() {
+
+    # Copy binaries to /usr/bin/
+    install -Dm0644 -t "$pkgdir/usr/bin/" "hyprland/Hyprland"
+    install -Dm0644 -t "$pkgdir/usr/bin/" "hyprland/hyprctl"
+    install -Dm0644 -t "$pkgdir/usr/bin/" "hyprland/hyprpm"
+    chmod +x "$pkgdir/usr/bin/Hyprland" "$pkgdir/usr/bin/hyprctl" "$pkgdir/usr/bin/hyprpm"
+
+    # Copy wlroots .so to /usr/lib/ (assuming it's in the source directory)
+    find hyprland -name 'libwlroots.so.*' -type f -execdir \
+                install -Dm0755 -t "$pkgdir/usr/lib/" {} \;
+
+    # Copy desktop entry to /usr/share/wayland-sessions/
+    install -Dm0644 -t "$pkgdir/usr/share/wayland-sessions/" "hyprland/example/$pkgname.desktop"
+
+    # Copy configuration files to appropriate locations
+    install -Dm0644 -t "$pkgdir/usr/lib/systemd/system/hyprland.service" "hyprland/example/hyprland.service"
+    install -Dm0644 -t "$pkgdir/usr/share/$pkgname/" "hyprland/example/$pkgname.conf"
+    install -Dm0644 -t "$pkgdir/usr/share/licenses/$pkgname/" hyprland/LICENSE
+    install -Dm0644 -t "$pkgdir/usr/share/$pkgname/" hyprland/assets/*.png
+}

@@ -1,0 +1,38 @@
+# Maintainer: Omar Hany Kasban <omarhanykasban706@gmail.com>
+
+pkgname=hyprlang
+pkgver=0.5.0
+pkgrel=1
+pkgdesc='implementation library for the hypr config language'
+arch=(x86_64 aarch64)
+url="https://github.com/hyprwm/${pkgname^}"
+license=(BSD-3-Clause)
+depends=(gcc-libs
+         glibc)
+makedepends=(cmake)
+_archive="${pkgname^}-$pkgver"
+source=("$_archive.tar.gz::$url/releases/download/v$pkgver/v$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+
+prepare() {
+    mkdir -p "$srcdir/$_archive"
+    tar -xzf "$srcdir/$_archive.tar.gz" -C "$srcdir/$_archive" --strip-components=1
+}
+
+build() {
+    # No build action needed
+    :
+}
+
+package() {
+    # Copy Libs .so to /usr/lib/ (assuming it's in the source directory)
+    find hyprlang -name '*.so.*' -type f -execdir \
+                install -Dm0755 -t "$pkgdir/usr/lib/" {} \;
+    install -Dm0644 -t "$pkgdir/usr/lib/" hyprlang/libhyprlang.so
+    
+    # Create a symbolic link from libhyprlang.so.2 to libhyprlang.so.1
+    ln -s "/usr/lib/libhyprlang.so.2" "$pkgdir/usr/lib/libhyprlang.so.1"
+    # Copy configuration files to appropriate locations
+    install -Dm0644 -t "$pkgdir/usr/share/pkgconfig/" hyprlang/hyprlang.pc
+}
